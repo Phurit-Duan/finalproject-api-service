@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+  backend-django:
+    image: phuritmurin/django-find-objects:latest
+    ports:
+      - "8000:8000"
+  web-react:
+    image: phuritmurin/react-find-objects:latest
+    ports:
+      - "3000:3000"
