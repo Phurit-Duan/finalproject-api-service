@@ -1,11 +1,18 @@
-version: "3"
+version: "3.9"
 
 services:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
   backend-django:
-    image: phuritmurin/django-find-objects:latest
+    build: .
+    command: python manage.py runserver 0.0.0.0:8080
     ports:
       - "8000:8000"
-  web-react:
-    image: phuritmurin/react-find-objects:latest
-    ports:
-      - "3000:3000"
+    volumes:
+    - .:/app
+    depends_on:
+      - db
