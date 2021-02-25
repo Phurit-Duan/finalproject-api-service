@@ -36,3 +36,11 @@ def process_image(request):
 def test_image(request):
     file_uploaded = request.FILES.get('file_uploaded')
     return HttpResponse(file_uploaded, content_type="image/jpg")
+
+
+@csrf_exempt
+def test_text(request):
+    text = request.POST.get('text')
+    response = { "result" : text }
+    return JsonResponse(response)
+

@@ -22,4 +22,5 @@ urlpatterns = [
     path('test/', views.test),
     path('test_image/', views.test_image),
     path('process_image/', views.process_image, name='file_uploaded'),
+    path('test_text/', views.test_text, name='text'),
 ]
