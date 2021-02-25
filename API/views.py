@@ -19,7 +19,7 @@ def process_image(request):
     class_name = ['berry','bird','dog','flower','other']
     model = tf.keras.models.load_model('././fo.h5') 
     if request.method == 'POST':
-        file_uploaded = request.FILES.get('file_uploaded')
+        file_uploaded = request.FILES.get('image')
         image = Image.open(file_uploaded)
         image = tf.keras.preprocessing.image.array_to_img(image.resize((128, 128)))
         x = np.expand_dims(image, axis=0)

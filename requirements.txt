@@ -7,3 +7,4 @@ djangorestframework
 tensorflow
 pillow
 numpy
+django-cors-headers
