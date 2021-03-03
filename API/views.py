@@ -9,15 +9,12 @@ from base64 import b64decode
 import tensorflow as tf
 import os
 import numpy as np
-<<<<<<< HEAD
-import json 
-=======
 from nltk import NaiveBayesClassifier as nbc
 from pythainlp.tokenize import word_tokenize
 import codecs
 from itertools import chain
 import pickle
->>>>>>> 2094086a2fc281f866b6ae2e6734abde71106116
+import json
 
 # Create your views here.
 def test(request):
