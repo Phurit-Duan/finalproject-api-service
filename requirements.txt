@@ -8,3 +8,5 @@ tensorflow
 pillow
 numpy
 django-cors-headers
+pythainlp
+nltk
