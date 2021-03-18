@@ -5,6 +5,7 @@ djangorestframework
 pytz==2020.5
 sqlparse==0.4.1
 psycopg2
+tensorflow
 pillow
 numpy
 pythainlp
