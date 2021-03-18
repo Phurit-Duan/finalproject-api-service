@@ -4,3 +4,9 @@ pytz==2020.5
 sqlparse==0.4.1
 psycopg2
 djangorestframework
+tensorflow
+pillow
+numpy
+django-cors-headers
+pythainlp
+nltk
