@@ -1,10 +1,7 @@
-version: "3.9"
-
+version: "3"
+   
 services:
-  backend-django:
-    build: .
-    command: python manage.py runserver
+  web-django:
+    image: phuritmurin/django-find-objects:latest
     ports:
       - "8000:8000"
-    volumes:
-    - .:/app
