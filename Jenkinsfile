@@ -21,6 +21,7 @@ pipeline {
             steps {
                 sh('ls -al')
                 sh('printenv')
+                sh "docker system prune -f --all"
             }
         }
 
