@@ -14,15 +14,31 @@ from pythainlp.tokenize import word_tokenize
 import codecs
 from itertools import chain
 import pickle
+import json
 
 # Create your views here.
 def test(request):
     return JsonResponse({'Text': 'HI'})
 
+def decode_predictions(preds, top=3, class_list_path='././model-pre.json'):
+  if len(preds.shape) != 2 or preds.shape[1] != 5:
+    raise ValueError('`decode_predictions` expects '
+                     'a batch of predictions '
+                     '(i.e. a 2D array of shape (samples, 1000)). '
+                     'Found array with shape: ' + str(preds.shape))
+  index_list = json.load(open(class_list_path))
+  results = []
+  for pred in preds:
+    top_indices = pred.argsort()[-top:][::-1]
+    result = [tuple(index_list[str(i)]) + (np.round(100*(pred[i]),5),) for i in top_indices]
+    result.sort(key=lambda x: x[2], reverse=True)
+    results.append(result)
+  return results
+
 @csrf_exempt
 def process_image(request):
-    class_name = ['berry','bird','dog','flower','other']
-    model = tf.keras.models.load_model('././fo.h5') 
+    result = {}
+    model = tf.keras.models.load_model('././fo_v2.h5') 
     if request.method == 'POST':
         file_uploaded = request.FILES.get('image')
         image = Image.open(file_uploaded)
@@ -30,7 +46,9 @@ def process_image(request):
         x = np.expand_dims(image, axis=0)
         x_input = tf.keras.applications.mobilenet_v2.preprocess_input(x, data_format=None)
         predictions = model.predict(x_input)
-        result = class_name[(int(np.argmax(predictions[0])))]
+        result_pred = decode_predictions(predictions)
+        for i in range(len(result_pred[0])):
+            result[i] = [result_pred[0][i][0], result_pred[0][i][1], result_pred[0][i][2]]
         content_type = file_uploaded.content_type
         response = { "status" : "POST API and you have uploaded a {} file".format(content_type) , "result" : result }
     else:
