@@ -5,7 +5,7 @@ pipeline {
     }
 
     environment {
-        image = "phuritmurin/django-find-objects"
+        image = "phuritmurin/django-find-objects:latest"
         registry = "docker.io"
     }
 
