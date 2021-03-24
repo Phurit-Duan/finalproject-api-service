@@ -12,6 +12,7 @@ import numpy as np
 from pythainlp.tokenize import word_tokenize
 import pickle
 import json
+from business_logic.Objectdetection import detection
 
 # Create your views here.
 def test(request):
@@ -51,6 +52,31 @@ def process_image(request):
     else:
         response = { "status" : "none" }
     return JsonResponse(response)
+
+@csrf_exempt
+def object_detection_api(api_request):
+    json_object = {'success': False}
+
+    if api_request.method == "POST":
+
+        if api_request.POST.get("image64", None) is not None:
+            base64_data = api_request.POST.get("image64", None).split(',', 1)[1]
+            data = b64decode(base64_data)
+            data = np.array(Image.open(io.BytesIO(data)))
+            result, detection_time = detection(data)
+
+        elif api_request.FILES.get("image", None) is not None:
+            image_api_request = api_request.FILES["image"]
+            image_bytes = image_api_request.read()
+            image = np.array(Image.open(image_api_request))
+            result, detection_time = detection(image, web=True)
+
+    if result:
+        json_object['success'] = True
+    json_object['time'] = str(round(detection_time))+" seconds"
+    json_object['objects'] = result
+    print(json_object)
+    return JsonResponse(json_object)
 
 @csrf_exempt
 def nlp(request):
