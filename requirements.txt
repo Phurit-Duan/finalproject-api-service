@@ -4,6 +4,7 @@ django-cors-headers
 djangorestframework
 pytz==2020.5
 sqlparse==0.4.1
+opencv-python
 psycopg2
 tensorflow
 pillow
