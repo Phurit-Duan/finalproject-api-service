@@ -10,3 +10,6 @@ pillow
 numpy
 pythainlp
 nltk
+torch
+whitenoise
+seaborn
