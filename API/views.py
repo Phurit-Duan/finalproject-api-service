@@ -9,10 +9,13 @@ from base64 import b64decode
 import tensorflow as tf
 import os
 import numpy as np
-from pythainlp.tokenize import word_tokenize
-import pickle
 import json
 from business_logic.Objectdetection import detection
+from langdetect import detect
+import re
+import string
+import pickle
+from pythainlp.tokenize import word_tokenize
 
 # Create your views here.
 def test(request):
@@ -80,14 +83,22 @@ def object_detection_api(api_request):
 
 @csrf_exempt
 def nlp(request):
-    # load the model from disk
-    vocabulary = pickle.load(open('././vocabulary.pkl', 'rb'))
-    NLP_model = pickle.load(open('././nlp-model.pkl', 'rb'))
-
-    test_sentence = request.POST.get('text') 
-    featurized_test_sentence =  {i:(i in word_tokenize(test_sentence.lower())) for i in vocabulary} 
-    response = {"test_sent":test_sentence 
-                ,"result":NLP_model.classify(featurized_test_sentence)} # ใช้โมเดลที่ train ประมวลผล
+    text = request.POST.get('text')
+    text = re.sub(r'<.*?>','', text)  
+    text = re.sub(r'#','',text)  
+    text = re.sub(r'…','',text)   
+    for c in string.punctuation:
+        text = re.sub(r'\{}'.format(c),'',text)
+    text = ' '.join(text.split())
+    print('clean text : ',text)
+    language = detect(text)
+    if (language == 'th'):
+        vocabulary = pickle.load(open('././nlp-vocabulary.pkl', 'rb'))
+        NLP_model  = pickle.load(open('././nlp-model.pkl',  'rb'))
+        featurized_test_sentence =  {i:(i in word_tokenize(text.lower())) for i in vocabulary} 
+        response = {"test_sent":text ,"result":NLP_model.classify(featurized_test_sentence)}
+    else:
+        response = {"test_sent":text ,"result":"Sorry!! This language is not supported, please send a message in Thai."}
     return JsonResponse(response)
 
 @csrf_exempt
@@ -101,4 +112,3 @@ def test_text(request):
     text = request.POST.get('text')
     response = { "result" : text }
     return JsonResponse(response)
-
