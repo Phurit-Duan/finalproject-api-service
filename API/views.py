@@ -10,24 +10,26 @@ import tensorflow as tf
 import os
 import numpy as np
 import json
-from business_logic.Objectdetection import detection
+import re
+import string
+import pickle
+from pythainlp.tokenize import word_tokenize
+from detect import detection
+from django.core.files.storage import FileSystemStorage
 from langdetect import detect
 import re
 import string
 import pickle
 from pythainlp.tokenize import word_tokenize
 
-# Create your views here.
-def test(request):
-    return JsonResponse({'Text': 'HI'})
 
-def decode_predictions(preds, top=3, class_list_path='././model-pre.json'):
-  if len(preds.shape) != 2 or preds.shape[1] != 5:
+def decode_predictions(preds, top=3, class_list_path='././bakery-classes.json'):
+  index_list = json.load(open(class_list_path))
+  if len(preds.shape) != 2 or preds.shape[1] != len(index_list):
     raise ValueError('`decode_predictions` expects '
                      'a batch of predictions '
                      '(i.e. a 2D array of shape (samples, 1000)). '
                      'Found array with shape: ' + str(preds.shape))
-  index_list = json.load(open(class_list_path))
   results = []
   for pred in preds:
     top_indices = pred.argsort()[-top:][::-1]
@@ -37,13 +39,13 @@ def decode_predictions(preds, top=3, class_list_path='././model-pre.json'):
   return results
 
 @csrf_exempt
-def process_image(request):
+def bakery_process_image(request):
     result = {}
-    model = tf.keras.models.load_model('././fo_v2.h5') 
+    model = tf.keras.models.load_model('././bakery.weights-35-0.87.hdf5') 
     if request.method == 'POST':
         file_uploaded = request.FILES.get('image')
         image = Image.open(file_uploaded)
-        image = tf.keras.preprocessing.image.array_to_img(image.resize((128, 128)))
+        image = tf.keras.preprocessing.image.array_to_img(image.resize((224, 224)))
         x = np.expand_dims(image, axis=0)
         x_input = tf.keras.applications.mobilenet_v2.preprocess_input(x, data_format=None)
         predictions = model.predict(x_input)
@@ -57,29 +59,40 @@ def process_image(request):
     return JsonResponse(response)
 
 @csrf_exempt
-def object_detection_api(api_request):
-    json_object = {'success': False}
+def amulet_process_image(request):
+    result = {}
+    model = tf.keras.models.load_model('././amulet-weights-45-0.18.hdf5') 
+    if request.method == 'POST':
+        file_uploaded = request.FILES.get('image')
+        image = Image.open(file_uploaded)
+        image = tf.keras.preprocessing.image.array_to_img(image.resize((224, 224)))
+        x = np.expand_dims(image, axis=0)
+        x_input = tf.keras.applications.mobilenet_v2.preprocess_input(x, data_format=None)
+        predictions = model.predict(x_input)
+        result_pred = decode_predictions(predictions, class_list_path='././amulet-classes.json')
+        for i in range(len(result_pred[0])):
+            result[i] = [result_pred[0][i][0], result_pred[0][i][1], result_pred[0][i][2]]
+        content_type = file_uploaded.content_type
+        response = { "status" : "POST API and you have uploaded a {} file".format(content_type) , "result" : result }
+    else:
+        response = { "status" : "none" }
+    return JsonResponse(response)
 
-    if api_request.method == "POST":
-
-        if api_request.POST.get("image64", None) is not None:
-            base64_data = api_request.POST.get("image64", None).split(',', 1)[1]
-            data = b64decode(base64_data)
-            data = np.array(Image.open(io.BytesIO(data)))
-            result, detection_time = detection(data)
-
-        elif api_request.FILES.get("image", None) is not None:
-            image_api_request = api_request.FILES["image"]
-            image_bytes = image_api_request.read()
-            image = np.array(Image.open(image_api_request))
-            result, detection_time = detection(image, web=True)
-
-    if result:
-        json_object['success'] = True
-    json_object['time'] = str(round(detection_time))+" seconds"
-    json_object['objects'] = result
-    print(json_object)
-    return JsonResponse(json_object)
+@csrf_exempt
+def thai_cash_process_image(request):
+    result = {}
+    if request.method == 'POST':
+        file_uploaded = request.FILES.get('image')
+        fs = FileSystemStorage()
+        filename = fs.save(file_uploaded.name, file_uploaded)
+        uploaded_file_url = fs.url(filename)
+        result = detection(source=uploaded_file_url, weights='best.pt', imgsz=640)
+        fs.delete(file_uploaded.name)
+        content_type = file_uploaded.content_type
+        response = { "status" : "POST API and you have uploaded a {} file".format(content_type) , "result" : result }
+    else:
+        response = { "status" : "none" }
+    return JsonResponse(response)
 
 @csrf_exempt
 def nlp(request):
@@ -101,14 +114,3 @@ def nlp(request):
         response = {"test_sent":text ,"result":"Sorry!! This language is not supported, please send a message in Thai."}
     return JsonResponse(response)
 
-@csrf_exempt
-def test_image(request):
-    file_uploaded = request.FILES.get('file_uploaded')
-    return HttpResponse(file_uploaded, content_type="image/jpg")
-
-
-@csrf_exempt
-def test_text(request):
-    text = request.POST.get('text')
-    response = { "result" : text }
-    return JsonResponse(response)

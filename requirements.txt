@@ -14,4 +14,8 @@ nltk
 torch
 whitenoise
 seaborn
+tqdm
+thop
 langdetect
+torchvision
+PyYAML
