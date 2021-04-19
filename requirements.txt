@@ -14,3 +14,4 @@ nltk
 torch
 whitenoise
 seaborn
+langdetect
