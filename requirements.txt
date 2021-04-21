@@ -7,6 +7,7 @@ sqlparse==0.4.1
 opencv-python
 psycopg2
 tensorflow
+keras
 pillow
 numpy
 pythainlp
