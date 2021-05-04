@@ -19,7 +19,7 @@ def bakery_process_image(request):
 
 @csrf_exempt
 def amulet_process_image(request):
-    path_model = "././amulet.weights-0054-1.2432.hdf5"
+    path_model = "././amulet.weights-0061-0.3788.hdf5"
     path_class = "././amulet-classes.json"
     response = process_image_prediction(request, path_model, path_class)
     return response
