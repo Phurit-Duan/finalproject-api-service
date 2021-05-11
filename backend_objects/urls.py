@@ -22,7 +22,7 @@ from API import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('buai-bakery-process-image/', views.bakery_process_image),
-    path('buai-thaicash-process-image/', views.thai_cash_process_image),
+    path('buai-banknotes-process-image/', views.thai_banknotes_process_image),
     path('buai-amulet-process-image/', views.amulet_process_image),
     path('buai-nlp-sentiment-chatbot/', views.nlp, name='text'),
 ]

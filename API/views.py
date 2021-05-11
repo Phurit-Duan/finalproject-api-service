@@ -26,7 +26,7 @@ def amulet_process_image(request):
 
 
 @csrf_exempt
-def thai_cash_process_image(request):
+def thai_banknotes_process_image(request):
     response = process_image_detect(request)
     return response
 
