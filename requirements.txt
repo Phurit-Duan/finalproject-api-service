@@ -9,7 +9,7 @@ psycopg2
 keras
 pillow
 numpy
-tensorflow==2.2
+tensorflow==2.4.1
 pythainlp
 nltk
 torch
