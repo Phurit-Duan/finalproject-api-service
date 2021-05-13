@@ -1,6 +1,5 @@
 import numpy as np
 import json
-import keras
 from keras.models import load_model
 from keras.preprocessing.image import array_to_img, img_to_array, load_img
 from keras.applications.mobilenet_v2 import preprocess_input

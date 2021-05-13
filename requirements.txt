@@ -6,10 +6,10 @@ pytz==2020.5
 sqlparse==0.4.1
 opencv-python
 psycopg2
-tensorflow
 keras
 pillow
 numpy
+tensorflow==2.2
 pythainlp
 nltk
 torch
